@@ -30,5 +30,12 @@ async def async_tempdir():
 
 
 def similarity(a, b):
-    print(SequenceMatcher(None, a.lower(), b.lower()).ratio())
     return SequenceMatcher(None, a.lower(), b.lower()).ratio()
+
+def is_spotify_url(text: str) -> bool:
+    pattern = r'https?://open\.spotify\.com/(track|album|artist|playlist|episode|show)/[a-zA-Z0-9]+'
+    return bool(re.match(pattern, text.strip()))
+
+def extract_spotify_track_id(url: str) -> str | None:
+    match = re.match(r'https?://open\.spotify\.com/track/([a-zA-Z0-9]+)', url.strip())
+    return match.group(1) if match else None
