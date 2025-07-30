@@ -17,36 +17,37 @@ def setup(r: Router):
 
 async def search(msg: Message):
     assert msg.text and msg.from_user is not None
-    query = msg.text.strip()
+    if msg.chat.id == msg.from_user.id:
+        query = msg.text.strip()
 
-    if is_url(query):
-        if is_spotify_url(query):
-            track = await search_spotify_url(query)
-            fake_callback = CallbackQuery(
-                id='fake',
-                from_user=msg.from_user,
-                chat_instance='fake',
-                data=f"track_{str(len(track_links)+1)}",
-                message=msg,
-            )
-            track_links[str(len(track_links)+1)] = track
-            await download(fake_callback)
+        if is_url(query):
+            if is_spotify_url(query):
+                track = await search_spotify_url(query)
+                fake_callback = CallbackQuery(
+                    id='fake',
+                    from_user=msg.from_user,
+                    chat_instance='fake',
+                    data=f"track_{str(len(track_links)+1)}",
+                    message=msg,
+                )
+                track_links[str(len(track_links)+1)] = track
+                await download(fake_callback)
 
-    else:
+        else:
 
-        results = await search_tracks(query)
+            results = await search_tracks(query)
 
-        if not results:
-            await msg.answer("Ничего не найдено :(")
-            return
+            if not results:
+                await msg.answer("Ничего не найдено :(")
+                return
 
-        buttons = []
-        for idx, track in enumerate(results, 1):
-            track_links[str(idx)] = track # сохраняем ссылку
-            buttons.append([(f"{track['artist']} – {track['title']}", f"track_{idx}")])
+            buttons = []
+            for idx, track in enumerate(results, 1):
+                track_links[str(idx)] = track # сохраняем ссылку
+                buttons.append([(f"{track['artist']} – {track['title']}", f"track_{idx}")])
 
-        keyboard = create_inline_keyboard(buttons)
-        await msg.answer("Выбери трек:", reply_markup=keyboard)
+            keyboard = create_inline_keyboard(buttons)
+            await msg.answer("Выбери трек:", reply_markup=keyboard)
 
 async def download(callback: CallbackQuery):
     assert callback.data and callback.message is not None
