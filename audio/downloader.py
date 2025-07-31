@@ -2,6 +2,7 @@ import asyncio
 import aiohttp
 from yt_dlp import YoutubeDL
 from aiogram.types import BufferedInputFile
+from shared import HTTPS_PROXY
 
 
 async def download_audio(query: str, tmpdir: str):
@@ -9,6 +10,8 @@ async def download_audio(query: str, tmpdir: str):
         ydl_opts = {
             'format': 'bestaudio/best',
             'outtmpl': f'{tmpdir}/%(title)s.%(ext)s',
+            'proxy': HTTPS_PROXY,
+            'cookiefile': 'www.youtube.com_cookies.txt',
             'noplaylist': True,
             'quiet': True,
             'writethumbnail': True,       

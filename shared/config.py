@@ -6,15 +6,13 @@ class Settings(BaseSettings):
     BOT_TOKEN: str
     CLIENT_ID: str
     CLIENT_SECRET: str
-    PROXY_USER: str
-    PROXY_PASS: str
-    PROXY_HOST: str
+    HTTPS_PROXY: str
 
     @property
     def authorization(self):
         proxies = {
-            "http":  f"http://{self.PROXY_USER}:{self.PROXY_PASS}@{self.PROXY_HOST}",
-            "https": f"http://{self.PROXY_USER}:{self.PROXY_PASS}@{self.PROXY_HOST}"
+            "http": self.HTTPS_PROXY,
+            "https": self.HTTPS_PROXY
         }
 
         return Spotify(
