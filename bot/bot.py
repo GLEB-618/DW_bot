@@ -13,6 +13,15 @@ from bot.handlers import setup_all_routers
 #     await bot.set_my_commands(commands)
 
 
+async def keep_alive(bot: Bot):
+    while True:
+        try:
+            await bot.get_me()
+            print("[keep_alive] Telegram жив")
+        except Exception as e:
+            print(f"[keep_alive] Ошибка: {e}")
+        await asyncio.sleep(300)  # каждые 5 минут
+
 # Запуск бота
 async def run_bot():
     router = Router()
@@ -26,6 +35,7 @@ async def run_bot():
     dp.callback_query.middleware(ChatActionMiddleware())
 
     # await set_commands(bot)
+    asyncio.create_task(keep_alive(bot))
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
