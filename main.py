@@ -1,6 +1,5 @@
 import asyncio
-from bot import bot
+from app.bot.bot import start_telegram_bot
 
 if __name__ == "__main__":
-    print("Запуск бота")
-    asyncio.run(bot.run_bot())
+    asyncio.run(start_telegram_bot())

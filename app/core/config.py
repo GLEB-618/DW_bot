@@ -3,10 +3,15 @@ from spotipy import Spotify
 from spotipy.oauth2 import SpotifyClientCredentials
 
 class Settings(BaseSettings):
+    
     BOT_TOKEN: str
+
     CLIENT_ID: str
     CLIENT_SECRET: str
+
     HTTPS_PROXY: str
+
+    LOG_LEVEL: str
 
     @property
     def authorization(self):
@@ -24,4 +29,4 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env")
 
-settings = Settings() # type: ignore
+settings = Settings()

@@ -1,20 +1,18 @@
-from aiogram import Router, F, flags
-from aiogram.filters import Command, CommandObject
-from aiogram.types import Message, FSInputFile, CallbackQuery
-from aiogram.utils.keyboard import InlineKeyboardBuilder
-from aiogram.enums.chat_type import ChatType
-from aiogram.enums.chat_action import ChatAction
+from aiogram import Router
+from aiogram.types import Message, CallbackQuery, FSInputFile
 
-from audio import download_audio, search_tracks, fetch_thumbnail, search_spotify_url
-from shared import is_url, create_inline_keyboard, async_tempdir, is_spotify_url
-
-track_links = {}  # глобально или внутри FSM контекста
-
-def setup(r: Router):
-    r.message.register(search, F.text)
-    r.callback_query.register(download, F.data.startswith("track_"))
+from app.audio.downloader import download_audio, fetch_thumbnail
+from app.audio.search import search_spotify_url, search_tracks
+from app.core.logger import get_logger
+from app.core.utils import async_tempdir, create_inline_keyboard, is_spotify_url, is_url
 
 
+router = Router(name = "main")
+logger = get_logger(__name__)
+
+track_links = {}
+
+@router.message()
 async def search(msg: Message):
     assert msg.text and msg.from_user is not None
     if msg.chat.id == msg.from_user.id:
@@ -22,7 +20,12 @@ async def search(msg: Message):
 
         if is_url(query):
             if is_spotify_url(query):
+                logger.debug(f"Received Spotify URL: {query}")
                 track = await search_spotify_url(query)
+                if not track:
+                    logger.error(f"Failed to find track for Spotify URL: {query}")
+                    await msg.answer("Ошибка: не удалось найти трек по Spotify URL")
+                    return
                 fake_callback = CallbackQuery(
                     id='fake',
                     from_user=msg.from_user,
@@ -49,6 +52,7 @@ async def search(msg: Message):
             keyboard = create_inline_keyboard(buttons)
             await msg.answer("Выбери трек:", reply_markup=keyboard)
 
+@router.callback_query()
 async def download(callback: CallbackQuery):
     assert callback.data and callback.message is not None
     msg = await callback.message.answer("Скачиваю...")
@@ -60,6 +64,7 @@ async def download(callback: CallbackQuery):
             artist = track['artist']
             
             async with async_tempdir() as tmpdir:
+                logger.debug(f"Downloading track: {artist} - {title}")
                 query = f"{artist} - {title}"
                 path = await download_audio(query, tmpdir)
                 thumb = await fetch_thumbnail(track["cover"])

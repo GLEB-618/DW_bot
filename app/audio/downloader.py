@@ -2,15 +2,18 @@ import asyncio
 import aiohttp
 from yt_dlp import YoutubeDL
 from aiogram.types import BufferedInputFile
-from shared import HTTPS_PROXY
+from app.core.config import settings
+from app.core.logger import get_logger
 
+
+logger = get_logger(__name__)
 
 async def download_audio(query: str, tmpdir: str):
     try:
         ydl_opts = {
             'format': 'bestaudio/best',
             'outtmpl': f'{tmpdir}/%(title)s.%(ext)s',
-            'proxy': HTTPS_PROXY,
+            'proxy': settings.HTTPS_PROXY,
             'cookiefile': 'www.youtube.com_cookies.txt',
             'noplaylist': True,
             'quiet': True,
@@ -47,7 +50,8 @@ async def download_audio(query: str, tmpdir: str):
             
         return await asyncio.to_thread(_run_dl)
     except Exception as e:
-        print(f"Ошибка: {e}")
+        logger.error(f"Error downloading audio: {e}")
+        return ""
     
 async def fetch_thumbnail(url: str) -> BufferedInputFile:
     async with aiohttp.ClientSession() as session:
