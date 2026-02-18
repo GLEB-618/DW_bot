@@ -17,6 +17,8 @@ async def download_audio(query: str, tmpdir: str):
             'cookiefile': 'www.youtube.com_cookies.txt',
             'noplaylist': True,
             'quiet': True,
+            'js_runtimes': ['deno'],
+            'remote_components': ['ejs:github'],
             'writethumbnail': True,       
             'embedthumbnail': True,        
             'addmetadata': True, 

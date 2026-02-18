@@ -1,0 +1,13 @@
+services:
+  download-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: download-bot
+    restart: unless-stopped
+    environment:
+      HTTPS_PROXY: ${HTTPS_PROXY}
+      # плюс любые твои переменные токенов/настроек
+    volumes:
+      - ./www.youtube.com_cookies.txt:/app/www.youtube.com_cookies.txt:ro
+      - ./tmp:/tmp
