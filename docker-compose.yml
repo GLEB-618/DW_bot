@@ -6,8 +6,11 @@ services:
     container_name: download-bot
     restart: unless-stopped
     environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
       HTTPS_PROXY: ${HTTPS_PROXY}
-      # плюс любые твои переменные токенов/настроек
+      LOG_LEVEL: ${LOG_LEVEL}
     volumes:
       - ./www.youtube.com_cookies.txt:/app/www.youtube.com_cookies.txt:ro
       - ./tmp:/tmp
